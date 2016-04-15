@@ -1,0 +1,25 @@
+{
+  "name": "wt-github-webhook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "bluebird": "^3.3.5",
+    "mongodb": "^2.1.16",
+    "pivotaltracker": "^0.1.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/astanciu/github-webtask.git"
+  },
+  "author": "Alex Stanciu <alex@auth0.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/astanciu/github-webtask/issues"
+  },
+  "homepage": "https://github.com/astanciu/github-webtask#readme"
+}
