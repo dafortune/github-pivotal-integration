@@ -1,6 +1,11 @@
 'use strict'
 var tracker = require('pivotaltracker');
-var client = new tracker.Client('526e21d9841ac9fef72ed06924195b3f');
+var pivotalToken = process.env.PT_TOKEN
+if (!pivotalToken){
+  console.log('Missing env PT_TOKEN')
+  process.exit()
+}
+var client = new tracker.Client()
 
 
 // client.projects.all(function(error, projects) {
