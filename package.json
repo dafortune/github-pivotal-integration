@@ -5,8 +5,9 @@
   "main": "index.js",
   "dependencies": {
     "bluebird": "^3.3.5",
+    "github": "^0.2.4",
     "mongodb": "^2.1.16",
-    "pivotaltracker": "^0.1.4"
+    "request-promise": "^1.0.2"
   },
   "devDependencies": {},
   "scripts": {
