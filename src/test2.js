@@ -42,17 +42,43 @@ function pushToPivotal(i, a) {
   let issue = i
   let action = a
   console.log('Action: ' + action)
-  console.log('Has Next: ' + hasLabel(issue, 'next'))
   return function() {
     if ((action === 'opened' || action === 'labeled') && hasLabel(issue, 'next')) {
       console.log('Sending to PT')
       return createPTStoryFromIssue(issue)
     } else if (action === 'closed') {
       console.log('GitHub closed')
-      // TODO
-      return null
+      let extid = issue.repo.full_name + '/issues/' + issue.number
+      return getPTStoryByPath(extid)
+        .then(story => {
+          if (story) {
+            let update = {
+              id: story[0].id,
+              current_state: 'delivered'
+            }
+            return updatePTStory(update)
+          } else {
+            console.log(`This issue [${extid}] does not have a matching story in PT`)
+            return
+          }
+        })
+    } else if (action === 'reopened') {
+      console.log('GitHub reopened')
+      let extid = issue.repo.full_name + '/issues/' + issue.number
+      return getPTStoryByPath(extid)
+        .then(story => {
+          if (story) {
+            let update = {
+              id: story[0].id,
+              current_state: 'started'
+            }
+            return updatePTStory(update)
+          } else {
+            console.log(`This issue [${extid}] does not have a matching story in PT`)
+            return
+          }
+        })
     }
-    return null
   }
 }
 
@@ -121,6 +147,18 @@ function createPTStory(story) {
     json: story
   }
   return request.post(createOptions)
+}
+
+function updatePTStory(story) {
+  let updateOptions = {
+    method: 'PUT',
+    url: 'https://www.pivotaltracker.com/services/v5/projects/' + PROJECT_ID + '/stories/' + story.id,
+    headers: {
+      'X-TrackerToken': PT_TOKEN
+    },
+    json: story
+  }
+  return request.put(updateOptions)
 }
 
 function pushToMongo(issue) {

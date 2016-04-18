@@ -49,6 +49,8 @@ function handleChange(change) {
     handleNewStory(change)
   if (change.kind === 'story' && change.change_type === 'update')
     handleUpdateStory(change)
+  if (change.kind === 'story' && change.change_type === 'delete')
+    handleDeleteStory(change)
 }
 
 function handleNewStory(change) {
@@ -69,6 +71,14 @@ function handleUpdateStory(change) {
     updateState(change)
   }
 }
+
+// function handleDeleteStory(change) {
+//   console.log('handleUpdateStory()')
+//   getPTStory(change.id)
+//     .then(getGitHubIssueFromStory)
+//     .then(addRemoveLabels(null, ['in progress', 'next', 'ready', 'on hold']))
+//     .catch(console.log)
+// }
 
 function updateState(change) {
   if (change.new_values.current_state === 'started') {
@@ -96,6 +106,12 @@ function updateState(change) {
       .then(getGitHubIssueFromStory)
       .then(addRemoveLabels(null, ['next', 'on hold', 'ready', 'in progress']))
       .then(setGitHubIssueState('closed'))
+      .catch(console.log)
+  } else if (change.new_values.current_state === 'rejected') {
+    getPTStory(change.id)
+      .then(getGitHubIssueFromStory)
+      .then(addRemoveLabels('in progress', ['next', 'on hold', 'ready']))
+      .then(setGitHubIssueState('opened'))
       .catch(console.log)
   }
 }
