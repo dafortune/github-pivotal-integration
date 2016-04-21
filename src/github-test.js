@@ -19,12 +19,18 @@ github.authenticate({
   token: process.env.GITHUB_TOKEN
 })
 
-getIssue('astanciu', 'Points-WT', 9)
-  .then(addLabel('next'))
+getIssue('auth0', 'manage', 330)
+  // .then(addLabel('next'))
   .then(x => {
-    console.log(x.title)
+    // console.log(x)
+    var a = x.repository_url.split('/')
+    var repo = a.pop()
+    var owner = a.pop()
+    console.log(owner)
+    console.log(repo)
   })
   .catch(console.log)
+
 
 function addLabel(label) {
   console.log('Testing1: ' + label)

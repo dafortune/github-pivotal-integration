@@ -3,7 +3,7 @@
 
 const Promise = require('bluebird')
 var request = require('request-promise')
-// Promise.promisifyAll(request);
+  // Promise.promisifyAll(request);
 var GitHubApi = require("github")
 var github = new GitHubApi({
   version: "3.0.0",
@@ -24,6 +24,7 @@ let GITHUB_TOKEN = null
 module.exports = handleHook
 
 function handleHook(ctx, req, res) {
+  console.log('\n----------\npivotal-webhook\n----------\n')
   PT_TOKEN = ctx.data.PT_TOKEN
   PROJECT_ID = ctx.data.PROJECT_ID
   GITHUB_TOKEN = ctx.data.GITHUB_TOKEN
@@ -81,6 +82,7 @@ function handleUpdateStory(change) {
 // }
 
 function updateState(change) {
+  console.log('updateState()')
   if (change.new_values.current_state === 'started') {
     getPTStory(change.id)
       .then(getGitHubIssueFromStory)
@@ -101,17 +103,19 @@ function updateState(change) {
       .then(getGitHubIssueFromStory)
       .then(addRemoveLabels('next', ['on hold', 'ready', 'in progress']))
       .catch(console.log)
-  } else if (change.new_values.current_state === 'delivered') {
-    getPTStory(change.id)
-      .then(getGitHubIssueFromStory)
-      .then(addRemoveLabels(null, ['next', 'on hold', 'ready', 'in progress']))
-      .then(setGitHubIssueState('closed'))
-      .catch(console.log)
-  } else if (change.new_values.current_state === 'rejected') {
+  } 
+  // else if (change.new_values.current_state === 'delivered') {
+  //   getPTStory(change.id)
+  //     .then(getGitHubIssueFromStory)
+  //     .then(addRemoveLabels(null, ['next', 'on hold', 'ready', 'in progress']))
+  //     // .then(setGitHubIssueState('closed'))
+  //     .catch(console.log)
+  // }
+   else if (change.new_values.current_state === 'rejected') {
     getPTStory(change.id)
       .then(getGitHubIssueFromStory)
       .then(addRemoveLabels('in progress', ['next', 'on hold', 'ready']))
-      .then(setGitHubIssueState('opened'))
+      // .then(setGitHubIssueState('opened'))
       .catch(console.log)
   }
 }
@@ -136,15 +140,18 @@ function addRemoveLabels(label, labelsToremove) {
   if (!Array.isArray(labelsToremove)) labelsToremove = [labelsToremove]
 
   return function(issue) {
-    if (hasLabel(issue, label)) resolve(issue)
+    if (hasLabel(issue, label)) return issue
+    var a = issue.repository_url.split('/')
+    var repo = a.pop()
+    var owner = a.pop()
     let options = {
-        user: issue.user.login,
-        repo: issue.repository_url.split('/').pop(),
-        number: issue.number,
-        labels: issue.labels.map(l => l.name),
-        state: 'open'
-      }
-    
+      user: owner,
+      repo: repo,
+      number: issue.number,
+      labels: issue.labels.map(l => l.name),
+      state: 'open'
+    }
+
     // Add new label
     if (label)
       options.labels.push(label)
@@ -160,19 +167,21 @@ function addRemoveLabels(label, labelsToremove) {
   }
 }
 
-function setGitHubIssueState(state){
-  return function(issue){
+function setGitHubIssueState(state) {
+  return function(issue) {
+    console.log('setGitHubIssueState()')
     let options = {
-        user: issue.user.login,
-        repo: issue.repository_url.split('/').pop(),
-        number: issue.number,
-        state: state
-      }
+      user: issue.user.login,
+      repo: issue.repository_url.split('/').pop(),
+      number: issue.number,
+      state: state
+    }
     return updateGitHubIssue(options)
   }
 }
 
 function updateGitHubIssue(options) {
+  console.log('updateGitHubIssue()')
   return new Promise((resolve, reject) => {
     github.issues.edit(options, function(err, issue) {
       if (err) reject(err)
@@ -182,6 +191,7 @@ function updateGitHubIssue(options) {
 }
 
 function getPTStory(id) {
+  console.log('getPTStory()')
   var searchOptions = {
       method: 'GET',
       url: 'https://www.pivotaltracker.com/services/v5/projects/' + PROJECT_ID + '/stories/' + id,

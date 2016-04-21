@@ -1,4 +1,5 @@
 node_modules
-run-github-webhook.sh
+run-github2mongo-webhook.sh
+run-github2pivotal-webhook.sh
 run-pivotal-webhook.sh
 setEnv.sh
