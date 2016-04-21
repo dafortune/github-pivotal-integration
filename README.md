@@ -13,3 +13,6 @@ A collection of webtasks and scripts to setup integration between GitHub and Piv
 5. Create the Pivotal webhook with `run-pivotal-webhook.sh`
 
 
+### Other
+There is also a github-to-mongo webhook. This will simply mirror your github repo(s) to a mongo DB. If you do this, you can then enable the `issue-list.js` webhook, which will give you an endpoint to enter into Pivotal Tracker custom integration. This will add a GitHub column to Pivotal, and you can drag and drop issues from it.
+

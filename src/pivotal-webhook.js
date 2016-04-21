@@ -149,6 +149,12 @@ function addRemoveLabels(label, labelsToremove) {
       labels: issue.labels.map(l => l.name),
       state: 'open'
     }
+    let comment = {
+      user: owner,
+      repo: repo,
+      number: issue.number,
+      body: 'Status Update: `' + label + '`'
+    }
 
     // Add new label
     if (label)
@@ -161,7 +167,9 @@ function addRemoveLabels(label, labelsToremove) {
     })
 
     // Push to GH
-    return updateGitHubIssue(options)
+    return addGitHubComment(comment)
+      .then(x => updateGitHubIssue(options))
+     
   }
 }
 
@@ -176,6 +184,16 @@ function setGitHubIssueState(state) {
     }
     return updateGitHubIssue(options)
   }
+}
+
+function addGitHubComment(options){
+  console.log('addGitHubComment()')
+  return new Promise((resolve, reject) => {
+    github.issues.createComment(options, function(err, issue) {
+      if (err) reject(err)
+      resolve(issue)
+    })
+  })
 }
 
 function updateGitHubIssue(options) {
