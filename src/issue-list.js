@@ -1,11 +1,16 @@
 'use latest'
 'use strict'
 
+// This WebTask is used as a Pivotal Tracker Custom Integration.
+// It simply returns all issues from mongodb. Without this, PT
+// Would not have a custom integration, and thus the attribute
+// "external_id" used to link to GH issues, would not be available
+
 const Promise = require('bluebird')
 const MongoDB = require('mongodb')
 Promise.promisifyAll(MongoDB)
 const MongoClient = MongoDB.MongoClient
-let dbURL = null
+let DB_URL = null
 
 if (!String.prototype.encodeHTML) {
   String.prototype.encodeHTML = function() {
@@ -24,7 +29,7 @@ module.exports = (context, req, res) => {
 }
 
 function handleHook(ctx, req, res) {
-  dbURL = ctx.data.DBURL
+  DB_URL = ctx.data.DB_URL
   connectToDB()
     .then(getIssues)
     .then(makeXMLIssues)
@@ -76,7 +81,7 @@ function getIssues(db) {
 
 // Connects to Mongo and returns a promise
 function connectToDB() {
-  return MongoClient.connect(dbURL)
+  return MongoClient.connect(DB_URL)
 }
 
 function handleErr(res) {

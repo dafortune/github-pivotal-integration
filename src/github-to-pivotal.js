@@ -38,22 +38,25 @@ function pushToPivotal(i, a) {
   console.log('pushToPivotal()')
   let issue = i
   let action = a
-  console.log('Action: ' + action)
+
+  // Create issue in PT when something is labled 'next'
   if ((action === 'opened' || action === 'labeled') && hasLabel(issue, 'next')) {
-    console.log('Sending to PT')
+    console.log('Creating in PT')
     return createPTStoryFromIssue(issue)
-  } else if (action === 'closed') {
-    console.log('GitHub closed')
+  } 
+  // When GH issue is closed, set state in PT to 'delivered'
+  else if (action === 'closed') {
+    console.log('GitHub issue closed')
     let extid = issue.repo.full_name + '/issues/' + issue.number
     return getPTStoryByPath(extid)
       .then(story => {
         if (story) {
-          
           let update = {
             id: story[0].id,
             current_state: 'delivered'
           }
           if (!story.estimate)
+              // PT requires stories be estimated before being 'delivered'
               update.estimate = 0
           return updatePTStory(update)
         } else {
@@ -61,7 +64,9 @@ function pushToPivotal(i, a) {
           return
         }
       })
-  } else if (action === 'reopened') {
+  } 
+  // If GH issue is reopened, set PT state to 'started'
+  else if (action === 'reopened') {
     console.log('GitHub reopened')
     let extid = issue.repo.full_name + '/issues/' + issue.number
     return getPTStoryByPath(extid)
@@ -82,6 +87,7 @@ function pushToPivotal(i, a) {
   }
 }
 
+// Returns true if story contains label
 function hasLabel(issue, label) {
   let hasLabel = false
   issue.labels.forEach(l => {
@@ -90,6 +96,7 @@ function hasLabel(issue, label) {
   return hasLabel
 }
 
+// Creates PT story from an Issue
 function createPTStoryFromIssue(issue) {
   console.log('createPTStoryFromIssue()')
   let extid = issue.repo.full_name + '/issues/' + issue.number
@@ -101,7 +108,7 @@ function createPTStoryFromIssue(issue) {
     integration_id: INTEGRATION_ID,
     external_id: extid
   }
-
+  // Create or update the story
   return getPTStoryByPath(extid)
     .then(searchResults => {
       if (searchResults.length == 0) {
@@ -117,10 +124,9 @@ function createPTStoryFromIssue(issue) {
         return updatePTStory(update)
       }
     })
-
-  // return request.post(createOptions)    
 }
 
+// Returns Feature or But for a GH issue
 function getType(i) {
   var type = 'feature'
   i.labels.forEach(l => {
@@ -130,6 +136,7 @@ function getType(i) {
   return type
 }
 
+// Gets Story from PT by extension_id (ie: "auth0/manage/issues/123")
 function getPTStoryByPath(extid) {
   console.log('getPTStoryByPath()')
   let searchOptions = {
@@ -143,6 +150,7 @@ function getPTStoryByPath(extid) {
   return request.get(searchOptions)
 }
 
+// Create a story in PT
 function createPTStory(story) {
   console.log('createPTStory()')
   let createOptions = {
@@ -156,6 +164,7 @@ function createPTStory(story) {
   return request.post(createOptions)
 }
 
+// Update story in PT
 function updatePTStory(story) {
   let updateOptions = {
     method: 'PUT',

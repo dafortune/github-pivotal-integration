@@ -14,9 +14,9 @@ module.exports = handleHook
 function handleHook(ctx, req, res) {
   console.log('\n----------\ngithub-to-mongo-webhook\n----------n')
   DB_URL = ctx.data.DB_URL
-  var issue = ctx.body.issue
-  var repo = ctx.body.repository
-  var sender = ctx.body.sender
+  let issue = ctx.body.issue
+  let repo = ctx.body.repository
+  let sender = ctx.body.sender
 
   issue.repo = {
     id: repo.id,
@@ -29,13 +29,12 @@ function handleHook(ctx, req, res) {
     .then(() => respond({ done: 'ok' }, res))
     .catch(handleErr(res))
 
-  // respond({ done: 'ok' }, res)
 }
 
+// Upsert issue in mongo
 function pushToMongo(issue) {
   console.log('pushToMongo()')
   return function(db) {
-
     console.log('Upserting... ' + issue.title)
     return db.collection('Issues').update({ id: issue.id }, { $set: issue }, { upsert: true })
   }
@@ -47,11 +46,13 @@ function connectToDB() {
   return MongoClient.connect(DB_URL)
 }
 
+// Send reply back to caller
 function respond(msg, res) {
   res.writeHead(200, { 'Content-Type': 'application/json' })
   res.end(JSON.stringify(msg))
 }
 
+// Self descriptive :)
 function handleErr(res) {
   return function(err) {
     console.log(err)

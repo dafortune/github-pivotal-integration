@@ -3,7 +3,6 @@
 
 const Promise = require('bluebird')
 var request = require('request-promise')
-  // Promise.promisifyAll(request);
 var GitHubApi = require("github")
 var github = new GitHubApi({
   version: "3.0.0",
@@ -39,25 +38,24 @@ function handleHook(ctx, req, res) {
 
   changes.forEach(handleChange)
 
-
   respond({ done: 'ok' }, res)
 }
 
 function handleChange(change) {
   console.log('handleChange()')
-  console.log(change)
+  // console.log(change)
   if (change.kind === 'story' && change.change_type === 'create')
-    handleNewStory(change)
+    handleCreateStory(change)
   if (change.kind === 'story' && change.change_type === 'update')
     handleUpdateStory(change)
   if (change.kind === 'story' && change.change_type === 'delete')
     handleDeleteStory(change)
 }
 
-function handleNewStory(change) {
-  console.log('handleNewStory()')
+function handleCreateStory(change) {
+  console.log('handleCreateStory()')
   let story = change.new_values
-    // console.log(story)
+
   if (story) {
     console.log('Adding NEXT tag in GitHub')
     getGitHubIssueFromStory(story)
@@ -73,13 +71,13 @@ function handleUpdateStory(change) {
   }
 }
 
-// function handleDeleteStory(change) {
-//   console.log('handleUpdateStory()')
-//   getPTStory(change.id)
-//     .then(getGitHubIssueFromStory)
-//     .then(addRemoveLabels(null, ['in progress', 'next', 'ready', 'on hold']))
-//     .catch(console.log)
-// }
+function handleDeleteStory(change) {
+  console.log('handleUpdateStory()')
+  getPTStory(change.id)
+    .then(getGitHubIssueFromStory)
+    .then(addRemoveLabels(null, ['in progress', 'next', 'ready', 'on hold']))
+    .catch(console.log)
+}
 
 function updateState(change) {
   console.log('updateState()')
@@ -200,7 +198,6 @@ function getPTStory(id) {
       },
       json: true
     }
-    //external_id:"astanciu/Points-WT/issues/9"
   return request.get(searchOptions)
 }
 
@@ -212,15 +209,8 @@ function hasLabel(issue, label) {
   return hasLabel
 }
 
-
-
 function respond(msg, res) {
   res.writeHead(200, { 'Content-Type': 'application/json' })
   res.end(JSON.stringify(msg))
 }
 
-// function handleErr(res) {
-//   return function(err) {
-//     respond(err.message, res)
-//   }
-// }
