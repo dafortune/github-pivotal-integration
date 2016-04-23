@@ -17,7 +17,7 @@ function handleHook(ctx, req, res) {
   let issue = ctx.body.issue
   let repo = ctx.body.repository
   let sender = ctx.body.sender
-
+  if (ctx.data.crew) issue.crew = ctx.data.crew
   issue.repo = {
     id: repo.id,
     name: repo.name,

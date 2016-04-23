@@ -6,7 +6,7 @@ let PROJECT_ID = process.env.PROJECT_ID
 let INTEGRATION_ID = parseInt(process.env.INTEGRATION_ID)
 
 
-link(117661797, 'auth0/crew-2/issues/31')
+link(116906713, 'auth0/api2/issues/937')
 
 
 function link(pid, ghid) {

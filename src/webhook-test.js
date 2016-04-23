@@ -13,18 +13,8 @@ module.exports = (context, req, res) => {
 }
 
 function handleHook(ctx, req, res){
-  dbURL = ctx.data.DBURL
-  var issue  = ctx.body.issue
-  var repo   = ctx.body.repository
-  var sender = ctx.body.sender
-
-  issue.repo = {
-    id: repo.id,
-    name: repo.name,
-    full_name: repo.full_name
-  }
-
-  console.log(issue)
+  console.log(ctx)
+  // console.log(issue)
 
 
   respond({done: 'ok'}, res)
