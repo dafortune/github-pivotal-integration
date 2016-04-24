@@ -18,6 +18,11 @@ function handleHook(ctx, req, res) {
   let repo = ctx.body.repository
   let sender = ctx.body.sender
   if (ctx.data.crew) issue.crew = ctx.data.crew
+
+  issue.created_at = new Date(issue.created_at)
+  issue.updated_at = new Date(issue.updated_at)
+  if (issue.closed_at) issue.closed_at = new Date(issue.closed_at)
+    
   issue.repo = {
     id: repo.id,
     name: repo.name,

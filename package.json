@@ -6,6 +6,7 @@
   "dependencies": {
     "bluebird": "^3.3.5",
     "github": "^0.2.4",
+    "moment": "^2.13.0",
     "mongodb": "^2.1.16",
     "request-promise": "^1.0.2"
   },
