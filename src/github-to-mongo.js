@@ -13,25 +13,35 @@ module.exports = handleHook
 
 function handleHook(ctx, req, res) {
   console.log('\n----------\ngithub-to-mongo-webhook\n----------n')
+
+  // Handle GitHub WebHook Ping
+  if (ctx.body.zen){
+    respond({ zen: 'okay' }, res)
+    return 
+  }
+
   DB_URL = ctx.data.DB_URL
   let issue = ctx.body.issue
   let repo = ctx.body.repository
   let sender = ctx.body.sender
+  let action = ctx.body.action
   if (ctx.data.crew) issue.crew = ctx.data.crew
 
   issue.created_at = new Date(issue.created_at)
   issue.updated_at = new Date(issue.updated_at)
   if (issue.closed_at) issue.closed_at = new Date(issue.closed_at)
-    
+
   issue.repo = {
     id: repo.id,
     name: repo.name,
     full_name: repo.full_name
   }
 
+
+
   connectToDB()
     .then(pushToMongo(issue))
-    .then(() => respond({ done: 'ok' }, res))
+    .then(() => respond({ ok: action }, res))
     .catch(handleErr(res))
 
 }
@@ -61,6 +71,8 @@ function respond(msg, res) {
 function handleErr(res) {
   return function(err) {
     console.log(err)
-    respond(err.message, res)
+    // respond(err.message, res)
+    res.writeHead(500, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({error: err.message}))
   }
 }

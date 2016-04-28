@@ -30,7 +30,7 @@ function handleHook(ctx, req, res) {
   }
 
   pushToPivotal(issue, action)
-    .then(() => respond({ done: 'ok' }, res))
+    .then(() => respond({ ok: action, id: issue.number }, res))
     .catch(handleErr(res))
 }
 
@@ -188,6 +188,8 @@ function handleErr(res) {
   return function(err) {
     console.log('error:')
     console.log(err.error)
-    respond(err.message, res)
+    res.writeHead(500, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify(msg))
+    // respond(err.message, res)
   }
 }
