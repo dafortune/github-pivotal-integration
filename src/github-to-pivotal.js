@@ -28,6 +28,7 @@ function handleHook(ctx, req, res) {
     name: repo.name,
     full_name: repo.full_name
   }
+  console.log('From Issue: ' + repo.full_name + '/issues/' + issue.number)
 
   pushToPivotal(issue, action)
     .then(() => respond({ ok: action, id: issue.number }, res))
@@ -50,13 +51,13 @@ function pushToPivotal(i, a) {
     let extid = issue.repo.full_name + '/issues/' + issue.number
     return getPTStoryByPath(extid)
       .then(story => {
-        if (story) {
+        if (story.length>0) {
           let update = {
             id: story[0].id,
             current_state: 'delivered'
           }
-          if (!story.estimate)
-              // PT requires stories be estimated before being 'delivered'
+        
+          if (!story[0].estimate && story[0].story_type !== 'bug')
               update.estimate = 0
           return updatePTStory(update)
         } else {
@@ -166,6 +167,7 @@ function createPTStory(story) {
 
 // Update story in PT
 function updatePTStory(story) {
+  console.log('updatePTStory()')
   let updateOptions = {
     method: 'PUT',
     url: 'https://www.pivotaltracker.com/services/v5/projects/' + PROJECT_ID + '/stories/' + story.id,
@@ -187,9 +189,10 @@ function respond(msg, res) {
 function handleErr(res) {
   return function(err) {
     console.log('error:')
-    console.log(err.error)
+    console.log(err)
     res.writeHead(500, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify(msg))
+
+    res.end(JSON.stringify(err))
     // respond(err.message, res)
   }
 }
