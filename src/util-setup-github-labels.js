@@ -18,7 +18,7 @@ github.authenticate({
   type: "oauth",
   token: process.env.GITHUB_TOKEN
 })
-unifyRepo('astanciu','github-pivotal-integration')
+unifyRepo(process.env.GITHUB_ORG, process.env.GITHUB_REPO)
 
 
 function unifyRepo(user, repo){
@@ -27,13 +27,13 @@ function unifyRepo(user, repo){
   createLabel('next', 'F0CC00', user, repo)
   createLabel('on hold', '16214D', user, repo)
   createLabel('bug', 'F0CC00', user, repo)
-  updateLabel('bug', 'FF3E00', user, repo) 
-  createLabel('in progress', '44C7F4', user, repo)  
-  updateLabel('in progress', '44C7F4', user, repo) 
-  createLabel('later', '44C7F4', user, repo)  
-  updateLabel('later', '54658E', user, repo)  
-  createLabel('ready', '44C7F4', user, repo)  
-  updateLabel('ready', '7ED321', user, repo)  
+  updateLabel('bug', 'FF3E00', user, repo)
+  createLabel('in progress', '44C7F4', user, repo)
+  updateLabel('in progress', '44C7F4', user, repo)
+  createLabel('later', '44C7F4', user, repo)
+  updateLabel('later', '54658E', user, repo)
+  createLabel('ready', '44C7F4', user, repo)
+  updateLabel('ready', '7ED321', user, repo)
 
 }
 
@@ -59,7 +59,9 @@ function createLabel(name, color, user, repo){
     color: color
   }
   github.issues.createLabel(nextLabel, function(err, issue) {
+    if (!err) return
+
     if (err.message.indexOf('already_exists') > -1) return
-    if (err) console.dir(err)
+    console.dir(err)
   })
 }
